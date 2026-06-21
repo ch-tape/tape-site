@@ -258,14 +258,20 @@ async function loadFromGitHub() {
   // Parse JS arrays
   Object.keys(sectionMeta).forEach(sectionKey => {
     const meta = sectionMeta[sectionKey];
-    const regex = new RegExp('const\s+' + meta.varName + '\s*=\s*(\[[\s\S]*?\])\s*;');
-    const match = content.match(regex);
-    if (match) {
-      try {
-        dataCache[sectionKey] = JSON.parse(match[1]);
-      } catch(e) {
-        dataCache[sectionKey] = [];
+    const prefix = 'const ' + meta.varName + ' = ';
+    const idx = content.indexOf(prefix);
+    if (idx !== -1) {
+      let depth = 0, end = idx + prefix.length;
+      let inStr = false, strCh = '';
+      for (let i = end; i < content.length; i++) {
+        const ch = content[i];
+        if (inStr) { if (ch === strCh && content[i-1] !== '\\') inStr = false; }
+        else if (ch === '"' || ch === "'") { inStr = true; strCh = ch; }
+        else if (ch === '[') depth++;
+        else if (ch === ']') { depth--; if (depth === 0) { end = i + 1; break; } }
       }
+      try { dataCache[sectionKey] = JSON.parse(content.substring(idx + prefix.length, end)); }
+      catch(e) { dataCache[sectionKey] = []; }
     } else {
       dataCache[sectionKey] = [];
     }
