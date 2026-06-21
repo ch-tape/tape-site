@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>胶粘带行业资讯 - 胶带新材料</title>
+  <meta name="description" content="胶粘带行业资讯平台，汇聚知名胶带公司动态、新行业应用、新产品发布、展会动态、国内企业资讯及人才交流。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">📐</span>
+        <span class="logo-text">胶带新材料</span>
+      </a>
+      <nav class="nav" id="nav">
+        <a href="#home" class="nav-link active">首页</a>
+        <a href="#company-news" class="nav-link">公司动态</a>
+        <a href="#applications" class="nav-link">行业应用</a>
+        <a href="#products" class="nav-link">新品发布</a>
+        <a href="#exhibitions" class="nav-link">展会动态</a>
+        <a href="#domestic" class="nav-link">国内企业</a>
+        <a href="#talent" class="nav-link">人才交流</a>
+      </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 首页 Hero -->
+  <section id="home" class="hero">
+    <div class="container">
+      <h1>胶粘带行业资讯平台</h1>
+      <p>汇聚全球胶粘带行业前沿动态 — 公司资讯 · 新应用 · 新产品 · 展会 · 企业动向 · 人才交流</p>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num" data-target="128">0</span><span class="stat-label">本月资讯</span></div>
+        <div class="stat-item"><span class="stat-num" data-target="56">0</span><span class="stat-label">覆盖企业</span></div>
+        <div class="stat-item"><span class="stat-num" data-target="32">0</span><span class="stat-label">行业板块</span></div>
+        <div class="stat-item"><span class="stat-num" data-target="15">0</span><span class="stat-label">近期展会</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 快捷入口 -->
+  <section class="quick-links">
+    <div class="container">
+      <div class="quick-grid">
+        <a href="#company-news" class="quick-card">
+          <span class="quick-icon">🏢</span>
+          <h3>知名公司动态</h3>
+          <p>3M、日东、德莎、斯迪克等头部企业最新资讯</p>
+        </a>
+        <a href="#applications" class="quick-card">
+          <span class="quick-icon">🔬</span>
+          <h3>新行业应用</h3>
+          <p>新能源、半导体、汽车、医疗等新兴领域应用拓展</p>
+        </a>
+        <a href="#products" class="quick-card">
+          <span class="quick-icon">🆕</span>
+          <h3>新产品发布</h3>
+          <p>各大厂商最新胶粘带产品与技术突破</p>
+        </a>
+        <a href="#exhibitions" class="quick-card">
+          <span class="quick-icon">🎪</span>
+          <h3>展会动态</h3>
+          <p>国内外胶粘带行业展会预告与回顾</p>
+        </a>
+        <a href="#domestic" class="quick-card">
+          <span class="quick-icon">🇨🇳</span>
+          <h3>国内企业动态</h3>
+          <p>永大、晶华、友邦等国内胶粘带企业动向</p>
+        </a>
+        <a href="#talent" class="quick-card">
+          <span class="quick-icon">💼</span>
+          <h3>人才交流中心</h3>
+          <p>行业招聘求职、人才对接与职业发展</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 板块一：知名胶带公司动态资讯 -->
+  <section id="company-news" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🏢 知名胶带公司动态资讯</h2>
+        <p>聚焦全球头部胶粘带企业最新战略、财报与市场动作</p>
+      </div>
+      <div class="news-grid" id="companyNewsGrid"></div>
+    </div>
+  </section>
+
+  <!-- 板块二：新行业应用 -->
+  <section id="applications" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>🔬 新行业应用</h2>
+        <p>胶粘带在新能源、电子半导体、汽车轻量化等前沿领域的创新应用</p>
+      </div>
+      <div class="news-grid" id="applicationsGrid"></div>
+    </div>
+  </section>
+
+  <!-- 板块三：新产品发布 -->
+  <section id="products" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🆕 新产品发布</h2>
+        <p>各大胶粘带厂商最新产品与技术解决方案</p>
+      </div>
+      <div class="products-filter" id="productFilter">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="工业胶带">工业胶带</button>
+        <button class="filter-btn" data-filter="电子胶带">电子胶带</button>
+        <button class="filter-btn" data-filter="医用胶带">医用胶带</button>
+        <button class="filter-btn" data-filter="特种胶带">特种胶带</button>
+      </div>
+      <div class="news-grid" id="productsGrid"></div>
+    </div>
+  </section>
+
+  <!-- 板块四：展会动态 -->
+  <section id="exhibitions" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>🎪 展会动态</h2>
+        <p>国内外胶粘带行业展会、论坛及技术交流会信息</p>
+      </div>
+      <div class="exhibition-timeline" id="exhibitionTimeline"></div>
+    </div>
+  </section>
+
+  <!-- 板块五：国内知名企业动态 -->
+  <section id="domestic" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🇨🇳 国内知名企业动态</h2>
+        <p>中国胶粘带行业领军企业的最新发展动向</p>
+      </div>
+      <div class="domestic-enterprise-list" id="domesticEnterpriseList"></div>
+    </div>
+  </section>
+
+  <!-- 板块六：人才交流中心 -->
+  <section id="talent" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>💼 人才交流中心</h2>
+        <p>胶粘带行业招聘求职、人才对接与职业发展平台</p>
+      </div>
+      <div class="talent-stats">
+        <div class="talent-stat"><span class="talent-stat-num">86</span><span>在招岗位</span></div>
+        <div class="talent-stat"><span class="talent-stat-num">34</span><span>入驻企业</span></div>
+        <div class="talent-stat"><span class="talent-stat-num">520+</span><span>行业人才</span></div>
+      </div>
+      <div class="talent-grid" id="talentGrid"></div>
+      <div class="talent-actions">
+        <button class="talent-btn primary" id="btnRecruit"><span>📋</span> 我要招聘</button>
+        <button class="talent-btn secondary" id="btnApply"><span>📄</span> 我要求职</button>
+      </div>
+      <div class="talent-form-wrapper" id="talentFormWrapper">
+        <div class="talent-form" id="talentForm">
+          <h3 id="formTitle">发布招聘信息</h3>
+          <form id="jobForm">
+            <div class="form-row">
+              <input type="text" placeholder="公司/企业名称" required>
+              <input type="text" placeholder="职位名称" required>
+            </div>
+            <div class="form-row">
+              <input type="text" placeholder="工作地点">
+              <input type="text" placeholder="薪资范围（如 15-25K）">
+            </div>
+            <textarea rows="4" placeholder="职位描述、任职要求……" required></textarea>
+            <div class="form-row">
+              <input type="text" placeholder="联系人">
+              <input type="email" placeholder="联系邮箱" required>
+            </div>
+            <button type="submit" class="talent-btn primary">提交信息</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>关于我们</h4>
+          <p>胶带新材料 — 专注胶粘带行业资讯整合与传播，为行业从业者提供及时、专业的信息服务。</p>
+        </div>
+        <div class="footer-col">
+          <h4>资讯板块</h4>
+          <a href="#company-news">公司动态</a>
+          <a href="#applications">行业应用</a>
+          <a href="#products">新品发布</a>
+          <a href="#exhibitions">展会动态</a>
+          <a href="#domestic">国内企业</a>
+          <a href="#talent">人才交流</a>
+        </div>
+        <div class="footer-col">
+          <h4>联系方式</h4>
+          <p>📧 info@tapenewmaterial.com</p>
+          <p>📞 400-XXX-XXXX</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 胶带新材料 | 胶粘带行业资讯平台</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="回到顶部">↑</button>
+
+  <script src="js/data.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

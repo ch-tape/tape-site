@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 - 胶带新材料</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--primary:#1a73e8;--danger:#e53935;--success:#2e7d32;--bg:#f5f7fa;--white:#fff;--border:#e2e8f0;--text:#1e293b;--radius:8px}
+    body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
+
+    /* Login */
+    .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
+    .login-box{background:var(--white);padding:40px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center;width:360px}
+    .login-box h1{font-size:1.6rem;margin-bottom:8px}
+    .login-box p{color:#64748b;margin-bottom:24px;font-size:.85rem}
+    .login-box input{width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.95rem;margin-bottom:16px;text-align:center}
+    .login-box button{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:.95rem;cursor:pointer}
+    .login-error{color:var(--danger);font-size:.82rem;margin-top:8px}
+
+    /* Layout */
+    .admin-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+    .admin-header h2{font-size:1.1rem}
+    .admin-header .actions{display:flex;gap:10px;align-items:center}
+    .admin-header .site-link{font-size:.82rem;color:var(--primary);text-decoration:underline}
+
+    .admin-body{display:flex;min-height:calc(100vh - 60px)}
+    .sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0}
+    .sidebar a{display:block;padding:10px 24px;font-size:.88rem;color:var(--text);transition:.15s;border-left:3px solid transparent}
+    .sidebar a:hover,.sidebar a.active{background:#e8f0fe;color:var(--primary);border-left-color:var(--primary)}
+
+    .main{padding:24px;flex:1;overflow-y:auto}
+    .main h3{font-size:1.15rem;margin-bottom:20px}
+
+    /* Table */
+    .toolbar{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+    .btn{padding:8px 20px;border:none;border-radius:var(--radius);font-size:.85rem;cursor:pointer;font-weight:500;transition:.15s}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{opacity:.9}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-outline{border:1px solid var(--border);background:#fff}
+    .btn-outline:hover{background:#f8fafc}
+    .btn-success{background:var(--success);color:#fff}
+
+    table{width:100%;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    thead{background:#f8fafc}
+    th,td{padding:10px 14px;text-align:left;font-size:.82rem;border-bottom:1px solid var(--border)}
+    th{font-weight:600;color:#64748b;white-space:nowrap}
+    td{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    td.title-col{max-width:280px}
+    .actions-col{display:flex;gap:6px}
+    .actions-col button{padding:4px 10px;font-size:.75rem;border-radius:4px;cursor:pointer;border:none}
+    .btn-edit{background:#e8f0fe;color:var(--primary)}
+    .btn-del{background:#fce4ec;color:var(--danger)}
+
+    /* Form */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
+    .modal-bg.hidden{display:none}
+    .modal{background:var(--white);border-radius:12px;padding:28px;width:600px;max-width:90vw;max-height:85vh;overflow-y:auto}
+    .modal h4{font-size:1.05rem;margin-bottom:20px}
+    .modal label{display:block;font-size:.8rem;color:#64748b;margin-bottom:4px;margin-top:12px}
+    .modal input,.modal textarea,.modal select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.85rem;font-family:inherit}
+    .modal textarea{resize:vertical;min-height:80px}
+    .modal .row{display:flex;gap:12px}
+    .modal .row>*{flex:1}
+    .modal .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:12px 24px;border-radius:8px;font-size:.85rem;z-index:999;opacity:0;transform:translateY(20px);transition:.3s}
+    .toast.show{opacity:1;transform:translateY(0)}
+
+    .badge{padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
+    .badge-info{background:#e8f0fe;color:var(--primary)}
+
+    @media(max-width:768px){
+      .admin-body{flex-direction:column}
+      .sidebar{width:100%;display:flex;overflow-x:auto;padding:8px;border-right:none;border-bottom:1px solid var(--border)}
+      .sidebar a{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:8px 14px}
+      .sidebar a.active{border-left:none;border-bottom-color:var(--primary)}
+      .main{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h1>📐 胶带新材料</h1>
+    <p>管理后台 — 请输入密码</p>
+    <input type="password" id="loginPwd" placeholder="管理员密码" autofocus>
+    <button onclick="doLogin()">进入后台</button>
+    <div class="login-error" id="loginError"></div>
+    <p style="margin-top:16px;font-size:.75rem;color:#94a3b8">默认密码: admin2026</p>
+  </div>
+</div>
+
+<!-- Header -->
+<div id="app" style="display:none">
+<header class="admin-header">
+  <h2>📐 胶带新材料 · 管理后台</h2>
+  <div class="actions">
+    <a href="index.html" target="_blank" class="site-link">👁 预览网站 →</a>
+    <button class="btn btn-success" onclick="publishAll()">📤 发布更新</button>
+    <button class="btn btn-outline" onclick="location.reload()">🔄 刷新</button>
+  </div>
+</header>
+
+<div class="admin-body">
+  <nav class="sidebar" id="sidebar">
+    <a href="#" data-section="companyNews" class="active">🏢 公司动态</a>
+    <a href="#" data-section="applications">🔬 行业应用</a>
+    <a href="#" data-section="products">🆕 新品发布</a>
+    <a href="#" data-section="exhibitions">🎪 展会动态</a>
+    <a href="#" data-section="domesticEnterprises">🇨🇳 国内企业</a>
+    <a href="#" data-section="talentJobs">💼 人才交流</a>
+  </nav>
+  <main class="main" id="mainContent"></main>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-bg hidden" id="modalBg">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+// ===== Auth =====
+const ADMIN_PWD = 'admin2026';
+let currentSection = 'companyNews';
+let editId = null;
+
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (pwd === ADMIN_PWD) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initAdmin();
+  } else {
+    document.getElementById('loginError').textContent = '密码错误，请重试';
+  }
+}
+
+document.getElementById('loginPwd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ===== Section Labels =====
+const sectionMeta = {
+  companyNews: { title: '🏢 知名胶带公司动态资讯', singular: '资讯', fields: ['icon','tag','title','summary','date','source','content'] },
+  applications: { title: '🔬 新行业应用', singular: '应用', fields: ['icon','tag','title','summary','date','source','content'] },
+  products: { title: '🆕 新产品发布', singular: '产品', fields: ['icon','tag','title','summary','date','brand','source','content'] },
+  exhibitions: { title: '🎪 展会动态', singular: '展会', fields: ['month','day','title','location','desc','status','content'] },
+  domesticEnterprises: { title: '🇨🇳 国内知名企业动态', singular: '企业动态', fields: ['name','logo_bg','logo_icon','industry','news','date'] },
+  talentJobs: { title: '💼 人才交流中心', singular: '岗位', fields: ['company','logo_bg','logo_icon','title','location','salary','tags','desc'] }
+};
+
+const fieldLabels = {
+  icon:'图标',tag:'标签/分类',title:'标题',summary:'摘要',date:'日期',source:'来源',content:'正文',
+  brand:'品牌',month:'月份',day:'日期(日)',location:'地点',desc:'描述',status:'状态',
+  name:'企业名称',logo_bg:'Logo背景色',logo_icon:'Logo图标',industry:'行业',news:'新闻内容',
+  company:'公司',salary:'薪资',tags:'标签(逗号分隔)'
+};
+
+// ===== Init =====
+function initAdmin() {
+  loadFromStorage();
+  document.getElementById('sidebar').addEventListener('click', e => {
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      currentSection = e.target.dataset.section;
+      document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+      e.target.classList.add('active');
+      editId = null;
+      renderTable();
+    }
+  });
+  renderTable();
+}
+
+// ===== Storage =====
+function storageKey(section) { return 'tapenews_' + section; }
+
+function loadFromStorage() {
+  Object.keys(sectionMeta).forEach(section => {
+    const stored = localStorage.getItem(storageKey(section));
+    if (stored) {
+      window[section] = JSON.parse(stored);
+    }
+  });
+}
+
+function saveToStorage(section) {
+  localStorage.setItem(storageKey(section), JSON.stringify(window[section]));
+}
+
+// ===== Render Table =====
+function renderTable() {
+  const meta = sectionMeta[currentSection];
+  const data = window[currentSection] || [];
+  const fields = meta.fields;
+
+  let html = `<h3>${meta.title}</h3>`;
+  html += `<div class="toolbar">
+    <button class="btn btn-primary" onclick="openModal()">+ 新增${meta.singular}</button>
+    <span style="color:#64748b;font-size:.82rem;align-self:center">共 ${data.length} 条</span>
+  </div>`;
+
+  html += `<table><thead><tr>
+    ${fields.map(f => `<th>${fieldLabels[f] || f}</th>`).join('')}
+    <th>操作</th>
+  </tr></thead><tbody>`;
+
+  data.forEach((item, idx) => {
+    html += '<tr>';
+    fields.forEach(f => {
+      let val = item[f];
+      if (Array.isArray(val)) val = val.join(', ');
+      if (val === undefined || val === null) val = '';
+      html += `<td class="${f==='title'?'title-col':''}" title="${String(val).replace(/"/g,'&quot;')}">${String(val).substring(0,60)}</td>`;
+    });
+    html += `<td class="actions-col">
+      <button class="btn-edit" onclick="openModal(${idx})">编辑</button>
+      <button class="btn-del" onclick="deleteItem(${idx})">删除</button>
+    </td></tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+// ===== Modal =====
+function openModal(idx) {
+  editId = (idx !== undefined) ? idx : null;
+  const meta = sectionMeta[currentSection];
+  const data = window[currentSection] || [];
+  const item = editId !== null ? data[editId] : {};
+  const fields = meta.fields;
+
+  let html = `<h4>${editId !== null ? '编辑' : '新增'}${meta.singular}</h4>`;
+  fields.forEach(f => {
+    let val = item[f] !== undefined ? item[f] : '';
+    if (Array.isArray(val)) val = val.join(', ');
+    const label = fieldLabels[f] || f;
+    if (f === 'content' || f === 'news' || f === 'desc' || f === 'summary') {
+      html += `<label>${label}</label><textarea name="${f}">${String(val).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>`;
+    } else if (f === 'status') {
+      html += `<label>${label}</label><select name="${f}">
+        <option value="upcoming" ${val==='upcoming'?'selected':''}>即将举办</option>
+        <option value="ongoing" ${val==='ongoing'?'selected':''}>进行中</option>
+        <option value="past" ${val==='past'?'selected':''}>已结束</option>
+      </select>`;
+    } else {
+      html += `<div class="row"><div style="flex:1"><label>${label}</label><input name="${f}" value="${String(val).replace(/"/g,'&quot;')}"></div></div>`;
+    }
+  });
+
+  html += `<div class="btn-row">
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+    <button class="btn btn-primary" onclick="saveItem()">保存</button>
+  </div>`;
+
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalBg').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.add('hidden');
+  editId = null;
+}
+
+function saveItem() {
+  const meta = sectionMeta[currentSection];
+  const fields = meta.fields;
+  const formData = {};
+  fields.forEach(f => {
+    const el = document.querySelector(`#modalContent [name="${f}"]`);
+    let val = el ? el.value : '';
+    if (f === 'tags') {
+      val = val.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    formData[f] = val;
+  });
+
+  if (!window[currentSection]) window[currentSection] = [];
+  const data = window[currentSection];
+
+  if (editId !== null) {
+    data[editId] = formData;
+  } else {
+    formData.id = data.length > 0 ? Math.max(...data.map(d => d.id)) + 1 : 1;
+    data.push(formData);
+  }
+
+  saveToStorage(currentSection);
+  closeModal();
+  renderTable();
+  showToast('✅ 已保存（记得点「发布更新」同步到网站）');
+}
+
+function deleteItem(idx) {
+  if (!confirm('确定删除这条记录吗？')) return;
+  window[currentSection].splice(idx, 1);
+  saveToStorage(currentSection);
+  renderTable();
+  showToast('🗑 已删除');
+}
+
+// ===== Publish =====
+function publishAll() {
+  Object.keys(sectionMeta).forEach(section => {
+    saveToStorage(section);
+  });
+  showToast('🎉 内容已发布！刷新网站即可看到更新');
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Keyboard: ESC to close modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+document.getElementById('modalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalBg')) closeModal();
+});
+</script>
+</body>
+</html>
