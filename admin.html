@@ -1,231 +1,372 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理后台 - 胶带新材料</title>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--primary:#1a73e8;--danger:#e53935;--success:#2e7d32;--bg:#f5f7fa;--white:#fff;--border:#e2e8f0;--text:#1e293b;--radius:8px}
-    body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 - 胶带新材料</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#1a73e8;--danger:#e53935;--success:#2e7d32;--bg:#f5f7fa;--white:#fff;--border:#e2e8f0;--text:#1e293b;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
 
-    /* Login */
-    .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
-    .login-box{background:var(--white);padding:40px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.1);text-align:center;width:360px}
-    .login-box h1{font-size:1.6rem;margin-bottom:8px}
-    .login-box p{color:#64748b;margin-bottom:24px;font-size:.85rem}
-    .login-box input{width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.95rem;margin-bottom:16px;text-align:center}
-    .login-box button{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:.95rem;cursor:pointer}
-    .login-error{color:var(--danger);font-size:.82rem;margin-top:8px}
+.login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{background:var(--white);padding:40px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.1);width:400px}
+.login-box h1{font-size:1.5rem;margin-bottom:4px}
+.login-box .sub{color:#64748b;font-size:.82rem;margin-bottom:20px}
+.login-box label{display:block;font-size:.78rem;color:#64748b;margin-bottom:4px;margin-top:12px}
+.login-box input{width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.9rem}
+.login-box .hint{font-size:.72rem;color:#94a3b8;margin-top:4px}
+.login-box .hint a{color:var(--primary)}
+.login-box .btn-login{width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:.9rem;cursor:pointer;margin-top:20px;font-weight:500}
+.login-box .btn-login:disabled{opacity:.6;cursor:not-allowed}
+.login-error{color:var(--danger);font-size:.8rem;margin-top:8px;min-height:20px}
+.login-status{color:var(--success);font-size:.8rem;margin-top:8px;min-height:20px}
 
-    /* Layout */
-    .admin-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-    .admin-header h2{font-size:1.1rem}
-    .admin-header .actions{display:flex;gap:10px;align-items:center}
-    .admin-header .site-link{font-size:.82rem;color:var(--primary);text-decoration:underline}
+.admin-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.admin-header h2{font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.admin-header .actions{display:flex;gap:8px;align-items:center}
+.admin-header .site-link{font-size:.78rem;color:var(--primary);text-decoration:none;padding:4px 10px;border-radius:4px;border:1px solid var(--primary)}
+.admin-header .site-link:hover{background:#e8f0fe}
 
-    .admin-body{display:flex;min-height:calc(100vh - 60px)}
-    .sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0}
-    .sidebar a{display:block;padding:10px 24px;font-size:.88rem;color:var(--text);transition:.15s;border-left:3px solid transparent}
-    .sidebar a:hover,.sidebar a.active{background:#e8f0fe;color:var(--primary);border-left-color:var(--primary)}
+.admin-body{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:200px;background:var(--white);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
+.sidebar a{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:.84rem;color:var(--text);transition:.15s;border-left:3px solid transparent;cursor:pointer}
+.sidebar a:hover,.sidebar a.active{background:#e8f0fe;color:var(--primary);border-left-color:var(--primary)}
+.sidebar a .count{font-size:.7rem;background:#e2e8f0;padding:1px 6px;border-radius:8px;margin-left:auto}
 
-    .main{padding:24px;flex:1;overflow-y:auto}
-    .main h3{font-size:1.15rem;margin-bottom:20px}
+.main{padding:24px;flex:1;overflow-y:auto}
+.main h3{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.main h3 .badge{font-size:.75rem;font-weight:400;background:#e8f0fe;color:var(--primary);padding:2px 10px;border-radius:10px}
 
-    /* Table */
-    .toolbar{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-    .btn{padding:8px 20px;border:none;border-radius:var(--radius);font-size:.85rem;cursor:pointer;font-weight:500;transition:.15s}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-primary:hover{opacity:.9}
-    .btn-danger{background:var(--danger);color:#fff}
-    .btn-outline{border:1px solid var(--border);background:#fff}
-    .btn-outline:hover{background:#f8fafc}
-    .btn-success{background:var(--success);color:#fff}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.btn{padding:7px 16px;border:none;border-radius:var(--radius);font-size:.82rem;cursor:pointer;font-weight:500;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-outline{border:1px solid var(--border);background:#fff}
+.btn-outline:hover{background:#f8fafc}
+.btn-success{background:var(--success);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-    table{width:100%;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-    thead{background:#f8fafc}
-    th,td{padding:10px 14px;text-align:left;font-size:.82rem;border-bottom:1px solid var(--border)}
-    th{font-weight:600;color:#64748b;white-space:nowrap}
-    td{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    td.title-col{max-width:280px}
-    .actions-col{display:flex;gap:6px}
-    .actions-col button{padding:4px 10px;font-size:.75rem;border-radius:4px;cursor:pointer;border:none}
-    .btn-edit{background:#e8f0fe;color:var(--primary)}
-    .btn-del{background:#fce4ec;color:var(--danger)}
+table{width:100%;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+thead{background:#f8fafc}
+th,td{padding:9px 12px;text-align:left;font-size:.8rem;border-bottom:1px solid var(--border)}
+th{font-weight:600;color:#64748b;white-space:nowrap}
+td{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.title-col{max-width:260px}
+.actions-col{display:flex;gap:5px}
+.actions-col button{padding:3px 9px;font-size:.72rem;border-radius:4px;cursor:pointer;border:none}
+.btn-edit{background:#e8f0fe;color:var(--primary)}
+.btn-del{background:#fce4ec;color:var(--danger)}
+.btn-preview{background:#f3e5f5;color:#7b1fa2}
 
-    /* Form */
-    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
-    .modal-bg.hidden{display:none}
-    .modal{background:var(--white);border-radius:12px;padding:28px;width:600px;max-width:90vw;max-height:85vh;overflow-y:auto}
-    .modal h4{font-size:1.05rem;margin-bottom:20px}
-    .modal label{display:block;font-size:.8rem;color:#64748b;margin-bottom:4px;margin-top:12px}
-    .modal input,.modal textarea,.modal select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:.85rem;font-family:inherit}
-    .modal textarea{resize:vertical;min-height:80px}
-    .modal .row{display:flex;gap:12px}
-    .modal .row>*{flex:1}
-    .modal .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.empty-state{text-align:center;padding:60px 20px;color:#94a3b8}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:.9rem}
 
-    .toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:12px 24px;border-radius:8px;font-size:.85rem;z-index:999;opacity:0;transform:translateY(20px);transition:.3s}
-    .toast.show{opacity:1;transform:translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal-bg.hidden{display:none}
+.modal{background:var(--white);border-radius:12px;padding:24px;width:640px;max-width:92vw;max-height:85vh;overflow-y:auto}
+.modal h4{font-size:1rem;margin-bottom:16px}
+.modal .field{margin-bottom:12px}
+.modal label{display:block;font-size:.78rem;color:#64748b;margin-bottom:3px}
+.modal input,.modal textarea,.modal select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.84rem;font-family:inherit}
+.modal textarea{resize:vertical;min-height:70px}
+.modal .row{display:flex;gap:10px}
+.modal .row>*{flex:1}
+.modal .btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 
-    .badge{padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600}
-    .badge-info{background:#e8f0fe;color:var(--primary)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:10px 20px;border-radius:8px;font-size:.82rem;z-index:999;opacity:0;transform:translateY(20px);transition:.3s}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{background:var(--danger)}
 
-    @media(max-width:768px){
-      .admin-body{flex-direction:column}
-      .sidebar{width:100%;display:flex;overflow-x:auto;padding:8px;border-right:none;border-bottom:1px solid var(--border)}
-      .sidebar a{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:8px 14px}
-      .sidebar a.active{border-left:none;border-bottom-color:var(--primary)}
-      .main{padding:16px}
-    }
-  </style>
+.badge{padding:2px 7px;border-radius:8px;font-size:.68rem;font-weight:600}
+.badge-info{background:#e8f0fe;color:var(--primary)}
+
+.sync-bar{background:#fffbe6;border-bottom:1px solid #fef08a;padding:6px 20px;font-size:.76rem;color:#92400e;display:flex;align-items:center;gap:8px}
+.sync-bar .dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:pulse 1.5s infinite}
+.sync-bar.success{background:#f0fdf4;border-color:#86efac;color:#166534}
+.sync-bar.success .dot{background:#22c55e;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+@media(max-width:768px){
+  .admin-body{flex-direction:column}
+  .sidebar{width:100%;display:flex;overflow-x:auto;padding:6px;border-right:none;border-bottom:1px solid var(--border)}
+  .sidebar a{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:8px 14px}
+  .sidebar a.active{border-bottom-color:var(--primary)}
+  .main{padding:16px}
+}
+</style>
 </head>
 <body>
 
-<!-- Login -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <h1>📐 胶带新材料</h1>
-    <p>管理后台 — 请输入密码</p>
-    <input type="password" id="loginPwd" placeholder="管理员密码" autofocus>
-    <button onclick="doLogin()">进入后台</button>
+    <div class="sub">管理后台 · 数据直接同步到网站</div>
+    <label>🔑 管理密码</label>
+    <input type="password" id="loginPwd" placeholder="输入管理密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <label>🔐 GitHub Token</label>
+    <input type="password" id="loginToken" placeholder="ghp_xxxxxxxxxxxx">
+    <div class="hint"><a href="https://github.com/settings/tokens" target="_blank">生成 Token</a>，需勾选 <b>repo</b> 权限</div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">进入管理后台</button>
     <div class="login-error" id="loginError"></div>
-    <p style="margin-top:16px;font-size:.75rem;color:#94a3b8">默认密码: admin2026</p>
+    <div class="login-status" id="loginStatus"></div>
   </div>
 </div>
 
-<!-- Header -->
-<div id="app" style="display:none">
-<header class="admin-header">
-  <h2>📐 胶带新材料 · 管理后台</h2>
-  <div class="actions">
-    <a href="index.html" target="_blank" class="site-link">👁 预览网站 →</a>
-    <button class="btn btn-success" onclick="publishAll()">📤 发布更新</button>
-    <button class="btn btn-outline" onclick="location.reload()">🔄 刷新</button>
+<div id="adminWrap" style="display:none">
+  <div class="sync-bar" id="syncBar">
+    <span class="dot"></span>
+    <span id="syncMsg">正在从 GitHub 加载数据…</span>
   </div>
-</header>
-
-<div class="admin-body">
-  <nav class="sidebar" id="sidebar">
-    <a href="#" data-section="companyNews" class="active">🏢 公司动态</a>
-    <a href="#" data-section="applications">🔬 行业应用</a>
-    <a href="#" data-section="products">🆕 新品发布</a>
-    <a href="#" data-section="exhibitions">🎪 展会动态</a>
-    <a href="#" data-section="domesticEnterprises">🇨🇳 国内企业</a>
-    <a href="#" data-section="talentJobs">💼 人才交流</a>
-  </nav>
-  <main class="main" id="mainContent"></main>
+  <div class="admin-header">
+    <h2>📐 胶带新材料 · 管理后台</h2>
+    <div class="actions">
+      <a href="https://ch-tape.github.io/tape-site/" target="_blank" class="site-link">🔗 访问网站</a>
+      <button class="btn btn-outline" onclick="doLogout()" title="退出登录">退出</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="sidebar" id="sidebar">
+      <a class="active" data-section="company-news">🏭 公司动态 <span class="count" id="cnt-company-news">0</span></a>
+      <a data-section="applications">💡 行业应用 <span class="count" id="cnt-applications">0</span></a>
+      <a data-section="products">🆕 新品发布 <span class="count" id="cnt-products">0</span></a>
+      <a data-section="exhibitions">📅 展会动态 <span class="count" id="cnt-exhibitions">0</span></a>
+      <a data-section="domestic">🇨🇳 国内企业 <span class="count" id="cnt-domestic">0</span></a>
+      <a data-section="talent">💼 人才交流 <span class="count" id="cnt-talent">0</span></a>
+    </div>
+    <div class="main" id="mainContent"></div>
+  </div>
 </div>
-</div>
 
-<div class="toast" id="toast"></div>
 <div class="modal-bg hidden" id="modalBg">
   <div class="modal" id="modalContent"></div>
 </div>
 
-<script src="js/data.js"></script>
+<div class="toast" id="toast"></div>
+
 <script>
-// ===== Auth =====
-const ADMIN_PWD = 'admin2026';
-let currentSection = 'companyNews';
-let editId = null;
+// ===== Config =====
+const REPO_OWNER = 'ch-tape';
+const REPO_NAME = 'tape-site';
+const DATA_PATH = 'js/data.js';
+const ADMIN_PASSWORD = 'tapenews2024';
 
-function doLogin() {
-  const pwd = document.getElementById('loginPwd').value;
-  if (pwd === ADMIN_PWD) {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initAdmin();
-  } else {
-    document.getElementById('loginError').textContent = '密码错误，请重试';
-  }
-}
-
-document.getElementById('loginPwd').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-// ===== Section Labels =====
 const sectionMeta = {
-  companyNews: { title: '🏢 知名胶带公司动态资讯', singular: '资讯', fields: ['icon','tag','title','summary','date','source','content'] },
-  applications: { title: '🔬 新行业应用', singular: '应用', fields: ['icon','tag','title','summary','date','source','content'] },
-  products: { title: '🆕 新产品发布', singular: '产品', fields: ['icon','tag','title','summary','date','brand','source','content'] },
-  exhibitions: { title: '🎪 展会动态', singular: '展会', fields: ['month','day','title','location','desc','status','content'] },
-  domesticEnterprises: { title: '🇨🇳 国内知名企业动态', singular: '企业动态', fields: ['name','logo_bg','logo_icon','industry','news','date'] },
-  talentJobs: { title: '💼 人才交流中心', singular: '岗位', fields: ['company','logo_bg','logo_icon','title','location','salary','tags','desc'] }
+  'company-news': { varName: 'companyNews', title: '公司动态', singular: '资讯', fields: ['icon','tag','title','summary','date','source','content'] },
+  'applications': { varName: 'applications', title: '行业应用', singular: '应用', fields: ['icon','tag','title','summary','date','source','content'] },
+  'products': { varName: 'products', title: '新品发布', singular: '新品', fields: ['icon','tag','title','summary','date','source','content'] },
+  'exhibitions': { varName: 'exhibitions', title: '展会动态', singular: '展会', fields: ['icon','tag','title','summary','date','location','status','content'] },
+  'domestic': { varName: 'domesticEnterprises', title: '国内企业', singular: '企业', fields: ['logo_bg','logo_icon','name','industry','news','date'] },
+  'talent': { varName: 'talentJobs', title: '人才交流', singular: '职位', fields: ['company','logo_bg','logo_icon','title','location','salary','tags','desc'] }
 };
 
 const fieldLabels = {
-  icon:'图标',tag:'标签/分类',title:'标题',summary:'摘要',date:'日期',source:'来源',content:'正文',
-  brand:'品牌',month:'月份',day:'日期(日)',location:'地点',desc:'描述',status:'状态',
-  name:'企业名称',logo_bg:'Logo背景色',logo_icon:'Logo图标',industry:'行业',news:'新闻内容',
-  company:'公司',salary:'薪资',tags:'标签(逗号分隔)'
+  icon:'图标',tag:'标签',title:'标题',summary:'摘要',date:'日期',source:'来源',content:'正文',
+  location:'地点',status:'状态',logo_bg:'Logo底色',logo_icon:'Logo图标',name:'企业名',industry:'行业',
+  news:'动态',company:'企业',salary:'薪资',tags:'标签(逗号分隔)',desc:'描述'
 };
 
-// ===== Init =====
-function initAdmin() {
-  loadFromStorage();
-  document.getElementById('sidebar').addEventListener('click', e => {
-    if (e.target.tagName === 'A') {
-      e.preventDefault();
-      currentSection = e.target.dataset.section;
-      document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
-      e.target.classList.add('active');
-      editId = null;
-      renderTable();
+const sectionComments = {
+  companyNews: '板块一：知名胶带公司动态资讯',
+  applications: '板块二：新行业应用',
+  products: '板块三：新产品发布',
+  exhibitions: '板块四：展会动态',
+  domesticEnterprises: '板块五：国内胶带企业资讯',
+  talentJobs: '板块六：人才交流中心'
+};
+
+let ghToken = '';
+let currentSection = 'company-news';
+let dataCache = {};
+let editId = null;
+
+// ===== Login =====
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value.trim();
+  const token = document.getElementById('loginToken').value.trim();
+  const err = document.getElementById('loginError');
+  const status = document.getElementById('loginStatus');
+  err.textContent = '';
+  status.textContent = '';
+
+  if (pwd !== ADMIN_PASSWORD) { err.textContent = '❌ 密码错误'; return; }
+  if (!token || !token.startsWith('ghp_')) { err.textContent = '❌ Token 格式不正确，需要以 ghp_ 开头'; return; }
+
+  ghToken = token;
+  document.getElementById('loginBtn').disabled = true;
+  status.textContent = '⏳ 正在连接 GitHub…';
+  document.getElementById('loginPwd').disabled = true;
+  document.getElementById('loginToken').disabled = true;
+
+  loadFromGitHub()
+    .then(() => {
+      localStorage.setItem('tape_admin_token', token);
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('adminWrap').style.display = 'block';
+      updateSyncBar('success', '✅ 数据已从 GitHub 加载 · 上次保存者: ' + (dataCache._lastAuthor || '未知'));
+      currentSection = 'company-news';
+      switchSection('company-news');
+    })
+    .catch(e => {
+      err.textContent = '❌ ' + e.message;
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginPwd').disabled = false;
+      document.getElementById('loginToken').disabled = false;
+      status.textContent = '';
+    });
+}
+
+function doLogout() {
+  localStorage.removeItem('tape_admin_token');
+  ghToken = '';
+  dataCache = {};
+  document.getElementById('adminWrap').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('loginPwd').disabled = false;
+  document.getElementById('loginToken').value = '';
+  document.getElementById('loginToken').disabled = false;
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginError').textContent = '';
+}
+
+// ===== GitHub API =====
+async function ghApi(method, path, body) {
+  const res = await fetch('https://api.github.com' + path, {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + ghToken,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || res.status + ' ' + res.statusText);
+  return data;
+}
+
+async function loadFromGitHub() {
+  updateSyncBar('loading', '正在从 GitHub 加载 data.js…');
+  const file = await ghApi('GET', '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_PATH);
+  const content = atob(file.content);
+  dataCache._sha = file.sha;
+  dataCache._lastAuthor = file.commit?.author?.name || '';
+
+  // Parse JS arrays
+  Object.keys(sectionMeta).forEach(sectionKey => {
+    const meta = sectionMeta[sectionKey];
+    const prefix = 'const ' + meta.varName + ' = ';
+    const idx = content.indexOf(prefix);
+    if (idx !== -1) {
+      let depth = 0, end = idx + prefix.length;
+      let inStr = false, strCh = '';
+      for (let i = end; i < content.length; i++) {
+        const ch = content[i];
+        if (inStr) { if (ch === strCh && content[i-1] !== '\\') inStr = false; }
+        else if (ch === '"' || ch === "'") { inStr = true; strCh = ch; }
+        else if (ch === '[') depth++;
+        else if (ch === ']') { depth--; if (depth === 0) { end = i + 1; break; } }
+      }
+      try { dataCache[sectionKey] = JSON.parse(content.substring(idx + prefix.length, end)); }
+      catch(e) { dataCache[sectionKey] = []; }
+    } else {
+      dataCache[sectionKey] = [];
     }
   });
+  updateCounts();
+}
+
+async function saveToGitHub() {
+  updateSyncBar('loading', '正在保存到 GitHub…');
+  const js = generateDataJS();
+  const body = {
+    message: '更新内容 [' + new Date().toLocaleString('zh-CN') + ']',
+    content: btoa(unescape(encodeURIComponent(js))),
+    sha: dataCache._sha
+  };
+  const result = await ghApi('PUT', '/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + DATA_PATH, body);
+  dataCache._sha = result.content.sha;
+  dataCache._lastAuthor = result.commit?.author?.name || '';
+  updateSyncBar('success', '✅ 已保存到 GitHub · 网站将在 1-2 分钟后自动更新');
+  showToast('✅ 保存成功！网站自动更新中…');
+
+  // Clear localStorage to force site to read fresh data
+  Object.keys(sectionMeta).forEach(sk => {
+    localStorage.removeItem('tapenews_' + sectionMeta[sk].varName);
+  });
+}
+
+function generateDataJS() {
+  let js = '';
+  const sectionKeys = Object.keys(sectionMeta);
+  sectionKeys.forEach((sectionKey, idx) => {
+    const meta = sectionMeta[sectionKey];
+    const data = dataCache[sectionKey] || [];
+    if (idx > 0) js += '\n';
+    js += '// ===== ' + (sectionComments[meta.varName] || meta.title) + ' =====\n';
+    js += 'const ' + meta.varName + ' = ' + JSON.stringify(data, null, 2) + ';\n';
+  });
+  return js;
+}
+
+function updateSyncBar(state, msg) {
+  const bar = document.getElementById('syncBar');
+  const msgEl = document.getElementById('syncMsg');
+  bar.className = 'sync-bar' + (state === 'success' ? ' success' : '');
+  msgEl.textContent = msg;
+}
+
+function updateCounts() {
+  Object.keys(sectionMeta).forEach(sk => {
+    const cnt = (dataCache[sk] || []).length;
+    const el = document.getElementById('cnt-' + sk);
+    if (el) el.textContent = cnt;
+  });
+}
+
+// ===== Navigation =====
+function switchSection(sectionKey) {
+  currentSection = sectionKey;
+  document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+  document.querySelector('#sidebar [data-section="' + sectionKey + '"]').classList.add('active');
   renderTable();
 }
 
-// ===== Storage =====
-function storageKey(section) { return 'tapenews_' + section; }
-
-function loadFromStorage() {
-  Object.keys(sectionMeta).forEach(section => {
-    const stored = localStorage.getItem(storageKey(section));
-    if (stored) {
-      window[section] = JSON.parse(stored);
-    }
-  });
-}
-
-function saveToStorage(section) {
-  localStorage.setItem(storageKey(section), JSON.stringify(window[section]));
-}
-
-// ===== Render Table =====
+// ===== Render =====
 function renderTable() {
   const meta = sectionMeta[currentSection];
-  const data = window[currentSection] || [];
+  const data = dataCache[currentSection] || [];
   const fields = meta.fields;
 
-  let html = `<h3>${meta.title}</h3>`;
-  html += `<div class="toolbar">
-    <button class="btn btn-primary" onclick="openModal()">+ 新增${meta.singular}</button>
-    <span style="color:#64748b;font-size:.82rem;align-self:center">共 ${data.length} 条</span>
-  </div>`;
+  let html = '<h3>' + meta.title + ' <span class="badge">共 ' + data.length + ' 条</span></h3>';
+  html += '<div class="toolbar">';
+  html += '<button class="btn btn-primary" onclick="openModal()">+ 新增' + meta.singular + '</button>';
+  html += '<button class="btn btn-success" onclick="saveToGitHub()">📤 发布到网站</button>';
+  html += '<button class="btn btn-outline" onclick="loadFromGitHub().then(()=>{switchSection(currentSection);updateSyncBar('success','✅ 已从 GitHub 重新加载');showToast('✅ 已刷新');})">🔄 刷新数据</button>';
+  html += '</div>';
 
-  html += `<table><thead><tr>
-    ${fields.map(f => `<th>${fieldLabels[f] || f}</th>`).join('')}
-    <th>操作</th>
-  </tr></thead><tbody>`;
-
-  data.forEach((item, idx) => {
-    html += '<tr>';
-    fields.forEach(f => {
-      let val = item[f];
-      if (Array.isArray(val)) val = val.join(', ');
-      if (val === undefined || val === null) val = '';
-      html += `<td class="${f==='title'?'title-col':''}" title="${String(val).replace(/"/g,'&quot;')}">${String(val).substring(0,60)}</td>`;
+  if (data.length === 0) {
+    html += '<div class="empty-state"><div class="icon">📭</div><p>还没有内容，点击「新增' + meta.singular + '」开始</p></div>';
+  } else {
+    html += '<table><thead><tr>';
+    fields.forEach(f => html += '<th>' + (fieldLabels[f] || f) + '</th>');
+    html += '<th>操作</th></tr></thead><tbody>';
+    data.forEach((item, idx) => {
+      html += '<tr>';
+      fields.forEach(f => {
+        let val = item[f];
+        if (Array.isArray(val)) val = val.join(', ');
+        if (val === undefined || val === null) val = '';
+        html += '<td class="' + (f === 'title' || f === 'name' ? 'title-col' : '') + '" title="' + String(val).replace(/"/g, '&quot;') + '">' + String(val).substring(0, 55) + '</td>';
+      });
+      html += '<td class="actions-col"><button class="btn-edit" onclick="openModal(' + idx + ')">编辑</button><button class="btn-del" onclick="deleteItem(' + idx + ')">删除</button></td></tr>';
     });
-    html += `<td class="actions-col">
-      <button class="btn-edit" onclick="openModal(${idx})">编辑</button>
-      <button class="btn-del" onclick="deleteItem(${idx})">删除</button>
-    </td></tr>`;
-  });
+    html += '</tbody></table>';
+  }
 
-  html += '</tbody></table>';
   document.getElementById('mainContent').innerHTML = html;
 }
 
@@ -233,32 +374,26 @@ function renderTable() {
 function openModal(idx) {
   editId = (idx !== undefined) ? idx : null;
   const meta = sectionMeta[currentSection];
-  const data = window[currentSection] || [];
+  const data = dataCache[currentSection] || [];
   const item = editId !== null ? data[editId] : {};
   const fields = meta.fields;
 
-  let html = `<h4>${editId !== null ? '编辑' : '新增'}${meta.singular}</h4>`;
+  let html = '<h4>' + (editId !== null ? '编辑' : '新增') + meta.singular + '</h4>';
   fields.forEach(f => {
     let val = item[f] !== undefined ? item[f] : '';
     if (Array.isArray(val)) val = val.join(', ');
     const label = fieldLabels[f] || f;
     if (f === 'content' || f === 'news' || f === 'desc' || f === 'summary') {
-      html += `<label>${label}</label><textarea name="${f}">${String(val).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>`;
+      html += '<div class="field"><label>' + label + '</label><textarea name="' + f + '" rows="4">' + String(val).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</textarea></div>';
     } else if (f === 'status') {
-      html += `<label>${label}</label><select name="${f}">
-        <option value="upcoming" ${val==='upcoming'?'selected':''}>即将举办</option>
-        <option value="ongoing" ${val==='ongoing'?'selected':''}>进行中</option>
-        <option value="past" ${val==='past'?'selected':''}>已结束</option>
-      </select>`;
+      html += '<div class="field"><label>' + label + '</label><select name="' + f + '"><option value="upcoming" ' + (val==='upcoming'?'selected':'') + '>即将举办</option><option value="ongoing" ' + (val==='ongoing'?'selected':'') + '>进行中</option><option value="past" ' + (val==='past'?'selected':'') + '>已结束</option></select></div>';
+    } else if (f === 'tags') {
+      html += '<div class="field"><label>' + label + '</label><input name="' + f + '" value="' + String(val).replace(/"/g, '&quot;') + '" placeholder="用逗号分隔"></div>';
     } else {
-      html += `<div class="row"><div style="flex:1"><label>${label}</label><input name="${f}" value="${String(val).replace(/"/g,'&quot;')}"></div></div>`;
+      html += '<div class="field"><label>' + label + '</label><input name="' + f + '" value="' + String(val).replace(/"/g, '&quot;') + '"></div>';
     }
   });
-
-  html += `<div class="btn-row">
-    <button class="btn btn-outline" onclick="closeModal()">取消</button>
-    <button class="btn btn-primary" onclick="saveItem()">保存</button>
-  </div>`;
+  html += '<div class="btn-row"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveItem()">保存到暂存</button></div>';
 
   document.getElementById('modalContent').innerHTML = html;
   document.getElementById('modalBg').classList.remove('hidden');
@@ -274,16 +409,14 @@ function saveItem() {
   const fields = meta.fields;
   const formData = {};
   fields.forEach(f => {
-    const el = document.querySelector(`#modalContent [name="${f}"]`);
+    const el = document.querySelector('#modalContent [name="' + f + '"]');
     let val = el ? el.value : '';
-    if (f === 'tags') {
-      val = val.split(',').map(s => s.trim()).filter(Boolean);
-    }
+    if (f === 'tags') val = val.split(',').map(s => s.trim()).filter(Boolean);
     formData[f] = val;
   });
 
-  if (!window[currentSection]) window[currentSection] = [];
-  const data = window[currentSection];
+  if (!dataCache[currentSection]) dataCache[currentSection] = [];
+  const data = dataCache[currentSection];
 
   if (editId !== null) {
     data[editId] = formData;
@@ -292,43 +425,49 @@ function saveItem() {
     data.push(formData);
   }
 
-  saveToStorage(currentSection);
   closeModal();
   renderTable();
-  showToast('✅ 已保存（记得点「发布更新」同步到网站）');
+  updateCounts();
+  updateSyncBar('loading', '⚠️ 内容已暂存，请点击「发布到网站」推送到 GitHub');
+  showToast('📝 已暂存 · 点击「发布到网站」提交');
 }
 
 function deleteItem(idx) {
-  if (!confirm('确定删除这条记录吗？')) return;
-  window[currentSection].splice(idx, 1);
-  saveToStorage(currentSection);
+  if (!confirm('确定删除吗？此操作需「发布到网站」后生效')) return;
+  dataCache[currentSection].splice(idx, 1);
   renderTable();
-  showToast('🗑 已删除');
-}
-
-// ===== Publish =====
-function publishAll() {
-  Object.keys(sectionMeta).forEach(section => {
-    saveToStorage(section);
-  });
-  showToast('🎉 内容已发布！刷新网站即可看到更新');
+  updateCounts();
+  updateSyncBar('loading', '⚠️ 内容已暂存，请点击「发布到网站」推送到 GitHub');
+  showToast('🗑 已标记删除 · 点击「发布到网站」提交');
 }
 
 // ===== Toast =====
-function showToast(msg) {
+function showToast(msg, isError) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t.className = 'toast ' + (isError ? 'error' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Keyboard: ESC to close modal
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
+// ===== Event Listeners =====
 document.getElementById('modalBg').addEventListener('click', e => {
   if (e.target === document.getElementById('modalBg')) closeModal();
 });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+document.getElementById('sidebar').addEventListener('click', e => {
+  const a = e.target.closest('a');
+  if (a && a.dataset.section) switchSection(a.dataset.section);
+});
+
+// ===== Auto-login =====
+(function() {
+  const savedToken = localStorage.getItem('tape_admin_token');
+  if (savedToken) {
+    document.getElementById('loginToken').value = savedToken;
+  }
+})();
 </script>
 </body>
 </html>
