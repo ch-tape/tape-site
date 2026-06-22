@@ -273,6 +273,9 @@ img { max-width: 100%; display: block; }
 .footer-col p { font-size: .85rem; line-height: 1.6; }
 .footer-col a { display: block; font-size: .85rem; margin-bottom: 6px; color: #94a3b8; transition: var(--transition); }
 .footer-col a:hover { color: var(--white); }
+.wechat-qr { margin-top: 12px; text-align: center; }
+.wechat-qr img { border-radius: 8px; background: #fff; padding: 4px; display: block; }
+.wechat-qr p { font-size: .78rem; color: #94a3b8; margin-top: 6px; }
 
 .footer-bottom {
   border-top: 1px solid #334155;
